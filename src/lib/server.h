@@ -7,12 +7,12 @@ typedef struct server Server;
 
 int Server_getRound(Server *server);
 
-Graph * Grid_buildGraph(int *n, int *m);
+Graph * Network_buildGraph(int *n, int *m);
 
-void Grid_destroyGraph(Graph *graph);
+void Network_destroyGraph(Graph *graph);
 
-void Grid_allocateUpdateRounds(Graph *graph);
+void Network_allocateUpdateRounds(Graph *graph);
 
-void Grid_saveRoundsAndAllocation(Graph *graph);
+void Network_saveRoundsAndAllocation(Graph *graph);
 
 #endif

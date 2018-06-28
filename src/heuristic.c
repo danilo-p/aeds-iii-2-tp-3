@@ -4,9 +4,9 @@
 
 int main() {
     int n, m;
-    Graph *graph = Grid_buildGraph(&n, &m);
-    Grid_allocateUpdateRounds(graph);
-    Grid_saveRoundsAndAllocation(graph);
-    Grid_destroyGraph(graph);
+    Graph *graph = Network_buildGraph(&n, &m);
+    Network_allocateUpdateRounds(graph);
+    Network_saveRoundsAndAllocation(graph);
+    Network_destroyGraph(graph);
     return 0;
 }

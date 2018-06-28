@@ -27,7 +27,7 @@ void Server_destroy(Server *server) {
     free(server);
 }
 
-Graph * Grid_buildGraph(int *n, int *m) {
+Graph * Network_buildGraph(int *n, int *m) {
     scanf("%d", n);
     scanf("%d", m);
     int i;
@@ -52,7 +52,7 @@ Graph * Grid_buildGraph(int *n, int *m) {
     return graph;
 }
 
-void Grid_destroyGraph(Graph *graph) {
+void Network_destroyGraph(Graph *graph) {
     int i;
     for (i = 0; i < Graph_getVerticesNumber(graph); i += 1) {
         Vertex *vertex = Graph_getVertices(graph)[i];
@@ -62,7 +62,7 @@ void Grid_destroyGraph(Graph *graph) {
     Graph_destroy(graph);
 }
 
-void Grid_allocateUpdateRounds(Graph *graph) {
+void Network_allocateUpdateRounds(Graph *graph) {
     int i, j, rounds = 1;
     int verticesNumber = Graph_getVerticesNumber(graph);
     Vertex **vertices = Graph_getVertices(graph);
@@ -99,7 +99,7 @@ int compareServers(const void *a, const void *b) {
     return serverA->round > serverB->round;
 }
 
-void Grid_saveRoundsAndAllocation(Graph *graph) {
+void Network_saveRoundsAndAllocation(Graph *graph) {
     Vertex **vertices = Graph_getVertices(graph);
     int verticesNumber = Graph_getVerticesNumber(graph);
     FILE *file;
