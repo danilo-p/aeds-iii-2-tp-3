@@ -10,22 +10,34 @@ CFLAGS += -lm -Wall -Wextra -Werror
 
 .PHONY: all
 
-all: setup main
+all: setup heuristic brute_force
 
-main: main.o
-	gcc $(SRC) $(OBJ_DIR)/main.o -o $(BIN_DIR)/$(BIN_NAME) $(CFLAGS)
+heuristic: heuristic.o
+	gcc $(SRC) $(OBJ_DIR)/heuristic.o -o $(BIN_DIR)/$(BIN_NAME)h $(CFLAGS)
 
-main.o:
-	gcc -c $(SRC_DIR)/main.c -g -o $(OBJ_DIR)/main.o $(CFLAGS)
+heuristic.o:
+	gcc -c $(SRC_DIR)/heuristic.c -g -o $(OBJ_DIR)/heuristic.o $(CFLAGS)
+
+brute_force: brute_force.o
+	gcc $(SRC) $(OBJ_DIR)/brute_force.o -o $(BIN_DIR)/$(BIN_NAME)fb $(CFLAGS)
+
+brute_force.o:
+	gcc -c $(SRC_DIR)/brute_force.c -g -o $(OBJ_DIR)/brute_force.o $(CFLAGS)
 
 setup:
 	mkdir -p $(BIN_DIR) $(OBJ_DIR)
 
-run:
-	$(BIN_DIR)/$(BIN_NAME)
-
 clean:
-	rm -f $(OBJ_DIR)/* $(BIN_DIR)/$(BIN_NAME)
+	rm -f $(OBJ_DIR)/* $(BIN_DIR)/*
 
-valgrind:
-	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all $(BIN_DIR)/$(BIN_NAME)
+run_h:
+	$(BIN_DIR)/$(BIN_NAME)h
+
+run_fb:
+	$(BIN_DIR)/$(BIN_NAME)fb
+
+valgrind_fb:
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all $(BIN_DIR)/$(BIN_NAME)brute_force
+
+valgrind_h:
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all $(BIN_DIR)/$(BIN_NAME)h
