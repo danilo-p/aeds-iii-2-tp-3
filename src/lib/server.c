@@ -15,7 +15,7 @@ struct server {
 Server * Server_create(int id) {
     Server *server = (Server *) malloc(sizeof(Server));
     server->id = id;
-    server->round = -1;
+    server->round = 0;
     return server;
 }
 
@@ -63,27 +63,31 @@ void Grid_destroyGraph(Graph *graph) {
 }
 
 void Grid_allocateUpdateRounds(Graph *graph) {
-    int i, j;
+    int i, j, rounds = 1;
     int verticesNumber = Graph_getVerticesNumber(graph);
     Vertex **vertices = Graph_getVertices(graph);
     for (i = 0; i < verticesNumber; i += 1) {
         Vertex *serverVertex = vertices[i];
         List *serverEdges = Vertex_getEdges(serverVertex);
-        int minRound = 0;
+        int available[rounds];
+        for (j = 0; j < rounds; j += 1) { available[j] = 1; }
         for (j = 0; j < List_getSize(serverEdges); j += 1) {
             Vertex *connectedVertex = (Vertex *) List_getItem(serverEdges, j);
             Server *connectedServer = (Server *) Vertex_getData(connectedVertex);
-            if (
-                connectedServer->round > 0 && (
-                    minRound == 0 ||
-                    minRound > connectedServer->round
-                )
-            ) {
-                minRound = connectedServer->round;
+            if (connectedServer->round > 0) {
+                available[connectedServer->round - 1] = 0;
             }
         }
         Server *server = (Server *) Vertex_getData(serverVertex);
-        server->round = minRound > 1 ? minRound - 1 : minRound + 1;
+        for (j = 0; j < rounds; j += 1) {
+            if (available[j]) {
+                server->round = j + 1;
+                break;
+            }
+        }
+        if (!server->round) {
+            server->round = ++rounds;
+        }
     }
 }
 
