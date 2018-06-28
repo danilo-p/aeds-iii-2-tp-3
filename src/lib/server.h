@@ -11,6 +11,8 @@ Graph * Grid_buildGraph(int *n, int *m);
 
 void Grid_destroyGraph(Graph *graph);
 
-int Grid_getMinUpdateRounds(Graph *graph);
+void Grid_allocateUpdateRounds(Graph *graph);
+
+void Grid_saveRoundsAndAllocation(Graph *graph);
 
 #endif

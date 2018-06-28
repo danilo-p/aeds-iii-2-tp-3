@@ -4,12 +4,17 @@
 #include "server.h"
 #include "graph.h"
 
+const char *MIN_ROUNDS_OUTPUT_FILE_NAME = "rodada.txt";
+const char *ALLOCATION_OUTPUT_FILE_NAME = "alocacao.txt";
+
 struct server {
+    int id;
     int round;
 };
 
-Server * Server_create() {
+Server * Server_create(int id) {
     Server *server = (Server *) malloc(sizeof(Server));
+    server->id = id;
     server->round = -1;
     return server;
 }
@@ -29,7 +34,7 @@ Graph * Grid_buildGraph(int *n, int *m) {
     Graph *graph = Graph_create(*n);
 
     for (i = 0; i < *n; i += 1) {
-        Server *server = Server_create();
+        Server *server = Server_create(i + 1);
         Vertex *vertex = Vertex_create(server);
         Graph_insertVertex(graph, vertex, i);
     }
@@ -57,29 +62,63 @@ void Grid_destroyGraph(Graph *graph) {
     Graph_destroy(graph);
 }
 
-int Grid_getMinUpdateRounds(Graph *graph) {
+void Grid_allocateUpdateRounds(Graph *graph) {
     int i, j;
-    int rounds = -1;
-
     int verticesNumber = Graph_getVerticesNumber(graph);
     Vertex **vertices = Graph_getVertices(graph);
     for (i = 0; i < verticesNumber; i += 1) {
         Vertex *serverVertex = vertices[i];
         List *serverEdges = Vertex_getEdges(serverVertex);
-        int minRound = -1;
+        int minRound = 0;
         for (j = 0; j < List_getSize(serverEdges); j += 1) {
             Vertex *connectedVertex = (Vertex *) List_getItem(serverEdges, j);
             Server *connectedServer = (Server *) Vertex_getData(connectedVertex);
             if (
-                (j == 0 && connectedServer->round > 0) ||
-                (minRound > 0 && minRound < connectedServer->round)
+                connectedServer->round > 0 && (
+                    minRound == 0 ||
+                    minRound > connectedServer->round
+                )
             ) {
                 minRound = connectedServer->round;
             }
         }
         Server *server = (Server *) Vertex_getData(serverVertex);
-        server->round = minRound > 0 ? minRound - 1 : ++rounds;
+        server->round = minRound > 1 ? minRound - 1 : minRound + 1;
     }
+}
 
-    return rounds;
+int compareServers(const void *a, const void *b) {
+    Vertex *vertexA = (*((Vertex **) a));
+    Vertex *vertexB = (*((Vertex **) b));
+    Server *serverA = Vertex_getData(vertexA);
+    Server *serverB = Vertex_getData(vertexB);
+    return serverA->round > serverB->round;
+}
+
+void Grid_saveRoundsAndAllocation(Graph *graph) {
+    Vertex **vertices = Graph_getVertices(graph);
+    int verticesNumber = Graph_getVerticesNumber(graph);
+    FILE *file;
+    Server *server;
+
+    qsort(
+        vertices,
+        verticesNumber,
+        sizeof(Vertex *),
+        compareServers
+    );
+
+    file = fopen(MIN_ROUNDS_OUTPUT_FILE_NAME, "w");
+    server = (Server *) Vertex_getData(vertices[verticesNumber - 1]);
+    fprintf(file, "%d\n", server->round);
+    printf("%d\n", server->round);
+    fclose(file);
+
+    file = fopen(ALLOCATION_OUTPUT_FILE_NAME, "w");
+    for (int i = 0; i < verticesNumber; i += 1) {
+        server = (Server *) Vertex_getData(vertices[i]);
+        fprintf(file, "%d %d\n", server->id, server->round);
+        printf("%d %d\n", server->id, server->round);
+    }
+    fclose(file);
 }

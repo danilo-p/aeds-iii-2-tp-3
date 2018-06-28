@@ -5,7 +5,8 @@
 int main() {
     int n, m;
     Graph *graph = Grid_buildGraph(&n, &m);
-    printf("%d\n", Grid_getMinUpdateRounds(graph));
+    Grid_allocateUpdateRounds(graph);
+    Grid_saveRoundsAndAllocation(graph);
     Grid_destroyGraph(graph);
     return 0;
 }
