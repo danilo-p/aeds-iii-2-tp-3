@@ -16,13 +16,13 @@ heuristic: heuristic.o
 	gcc $(SRC) $(OBJ_DIR)/heuristic.o -o $(BIN_DIR)/$(BIN_NAME)h $(CFLAGS)
 
 heuristic.o:
-	gcc -c $(SRC_DIR)/heuristic.c -g -o $(OBJ_DIR)/heuristic.o $(CFLAGS)
+	gcc -c $(SRC_DIR)/heuristic.c -o $(OBJ_DIR)/heuristic.o $(CFLAGS)
 
 brute_force: brute_force.o
 	gcc $(SRC) $(OBJ_DIR)/brute_force.o -o $(BIN_DIR)/$(BIN_NAME)fb $(CFLAGS)
 
 brute_force.o:
-	gcc -c $(SRC_DIR)/brute_force.c -g -o $(OBJ_DIR)/brute_force.o $(CFLAGS)
+	gcc -c $(SRC_DIR)/brute_force.c -o $(OBJ_DIR)/brute_force.o $(CFLAGS)
 
 setup:
 	mkdir -p $(BIN_DIR) $(OBJ_DIR)

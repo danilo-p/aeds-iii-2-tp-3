@@ -35,7 +35,7 @@ Vertex * Vertex_create(void *data) {
  * @param vertex The vertex.
  * @return void* The vertex data.
  */
-void * Vertex_getData(Vertex *vertex) {
+void * Vertex_getData(const Vertex *vertex) {
     return vertex->data;
 }
 
@@ -60,7 +60,7 @@ void Vertex_setData(Vertex *vertex, void *data) {
  * @param vertex The vertex.
  * @return List* The vertex edges.
  */
-List * Vertex_getEdges(Vertex *vertex) {
+List * Vertex_getEdges(const Vertex *vertex) {
     return vertex->edges;
 }
 
@@ -93,7 +93,7 @@ void Vertex_destroy(Vertex *vertex) {
  * @param vertex2 The target vertex.
  * @param oriented If 1, it will also add an edge between vertex2 and vertex1.
  */
-void Vertex_setEdge(Vertex *vertex1, Vertex *vertex2, int oriented) {
+void Vertex_setEdge(Vertex *vertex1, Vertex *vertex2, const int oriented) {
     List_insertItem(Vertex_getEdges(vertex1), vertex2, -1);
 
     if (!oriented) {
@@ -131,7 +131,7 @@ DinamicGraph * DinamicGraph_create() {
  * @param graph The graph.
  * @return List* The graph vertices.
  */
-List * DinamicGraph_getVertices(DinamicGraph *graph) {
+List * DinamicGraph_getVertices(const DinamicGraph *graph) {
     return graph->vertices;
 }
 
@@ -196,7 +196,7 @@ Graph * Graph_create(int verticesNumber) {
  * @param graph The graph.
  * @return Vertex** The graph vertices.
  */
-Vertex ** Graph_getVertices(Graph *graph) {
+Vertex ** Graph_getVertices(const Graph *graph) {
     return graph->vertices;
 }
 
@@ -208,7 +208,7 @@ Vertex ** Graph_getVertices(Graph *graph) {
  * @param graph The graph.
  * @return The graph vertices number defined on the creation.
  */
-int Graph_getVerticesNumber(Graph *graph) {
+int Graph_getVerticesNumber(const Graph *graph) {
     return graph->verticesNumber;
 }
 
@@ -235,7 +235,8 @@ void Graph_destroy(Graph *graph) {
  * @param graph The graph.
  * @param vertex The vertex to be inserted.
  */
-void Graph_insertVertex(Graph *graph, Vertex *vertex, int position) {
+void Graph_insertVertex(const Graph *graph, Vertex *vertex,
+                        const int position) {
     Vertex **vertices = Graph_getVertices(graph);
     vertices[position] = vertex;
 }

@@ -1,27 +1,30 @@
 #include <stdio.h>
-#include "lib/server.h"
+#include "lib/network.h"
 #include "lib/graph.h"
 #include "lib/list.h"
 
-int allocateUpdateRounds(Graph *graph) {
-    int i, minRounds = 0;
-    int verticesNumber = Graph_getVerticesNumber(graph);
-    Vertex **vertices = Graph_getVertices(graph);
-    for (i = 0; i < verticesNumber; i += 1) {
-        Vertex *serverVertex = vertices[i];
+int Network_allocateUpdateRounds(const Graph *network) {
+    int minRounds = 0;
+
+    Vertex **servers = Graph_getVertices(network);
+    for (int i = 0; i < Graph_getVerticesNumber(network); i += 1) {
+        Vertex *serverVertex = servers[i];
         Server *server = (Server *) Vertex_getData(serverVertex);
-        Server_setMinimumUpdateRound(serverVertex);
-        if (Server_getRound(server) > minRounds) {
+        if (Server_setMinimumUpdateRound(serverVertex) > minRounds) {
             minRounds = Server_getRound(server);
         }
     }
+
     return minRounds;
 }
 
 int main() {
     int n, m;
-    Graph *graph = Network_buildGraph(&n, &m);
-    Network_saveRoundsAndAllocation(graph, allocateUpdateRounds(graph));
-    Network_destroyGraph(graph);
+    Graph *network = Network_build(&n, &m);
+    Network_saveRoundsAndAllocation(
+        network,
+        Network_allocateUpdateRounds(network)
+    );
+    Network_destroy(network);
     return 0;
 }

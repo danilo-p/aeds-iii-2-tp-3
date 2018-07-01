@@ -7,12 +7,12 @@ List * List_create();
 
 void List_destroy(List *list);
 
-int List_getSize(List *list);
+int List_getSize(const List *list);
 
-int List_insertItem(List *list, void *data, int position);
+int List_insertItem(List *list, void *data, const int position);
 
-void * List_removeItem(List *list, int position);
+void * List_removeItem(List *list, const int position);
 
-void * List_getItem(List *list, int position);
+void * List_getItem(List *list, const int position);
 
 #endif

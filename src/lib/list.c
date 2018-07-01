@@ -119,7 +119,7 @@ void List_destroy(List *list) {
  * @param list The list.
  * @return Returns the size of the given list.
  */
-int List_getSize(List *list) {
+int List_getSize(const List *list) {
     return list->size;
 }
 
@@ -135,7 +135,7 @@ int List_getSize(List *list) {
  * @param size The size of the list.
  * @return int The positive position.
  */
-static int List_calculatePosition(int position, int size) {
+static int List_calculatePosition(int position, const int size) {
     if (size == 0) {
         position = 0;
     }
@@ -242,7 +242,7 @@ static Cell * List_getCell(List *list, int position) {
  *
  * @return The position (positive) that the item was inserted
  */
-int List_insertItem(List *list, void *data, int position) {
+int List_insertItem(List *list, void *data, const int position) {
     Cell *cell = Cell_create(data);
     Cell *current = List_getCell(list, position);
 
@@ -308,7 +308,7 @@ int List_insertItem(List *list, void *data, int position) {
  *
  * @return The data of the removed item.
  */
-void * List_removeItem(List *list, int position) {
+void * List_removeItem(List *list, const int position) {
     void *data;
 
     /*
@@ -369,7 +369,7 @@ void * List_removeItem(List *list, int position) {
  * @param position The position of the item
  * @return void* The data on the item. NULL if not found.
  */
-void * List_getItem(List *list, int position) {
+void * List_getItem(List *list, const int position) {
     Cell *cell = List_getCell(list, position);
     if (cell == NULL) {
         return NULL;

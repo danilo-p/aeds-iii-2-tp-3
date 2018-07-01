@@ -1,29 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "list.h"
-#include "server.h"
 #include "graph.h"
+#include "network.h"
 
 const char *MIN_ROUNDS_OUTPUT_FILE_NAME = "rodada.txt";
 const char *ALLOCATION_OUTPUT_FILE_NAME = "alocacao.txt";
 
 struct server {
-    int id;
     int round;
 };
 
-Server * Server_create(int id) {
+static Server * Server_create() {
     Server *server = (Server *) malloc(sizeof(Server));
-    server->id = id;
     server->round = 0;
     return server;
 }
 
-int Server_getId(Server *server) {
-    return server->id;
-}
-
-int Server_getRound(Server *server) {
+int Server_getRound(const Server *server) {
     return server->round;
 }
 
@@ -35,7 +29,7 @@ void Server_destroy(Server *server) {
     free(server);
 }
 
-Graph * Network_buildGraph(int *n, int *m) {
+Graph * Network_build(int *n, int *m) {
     scanf("%d", n);
     scanf("%d", m);
     int i;
@@ -60,7 +54,7 @@ Graph * Network_buildGraph(int *n, int *m) {
     return graph;
 }
 
-void Network_destroyGraph(Graph *graph) {
+void Network_destroy(Graph *graph) {
     int i;
     for (i = 0; i < Graph_getVerticesNumber(graph); i += 1) {
         Vertex *vertex = Graph_getVertices(graph)[i];
@@ -70,48 +64,48 @@ void Network_destroyGraph(Graph *graph) {
     Graph_destroy(graph);
 }
 
-int Server_checkConnections(Vertex* serverVertex) {
+static int Server_checkConnections(const Vertex* serverVertex) {
     Server *server = (Server *) Vertex_getData(serverVertex);
-    printf("Server_checkConnections - %d %d\n", Server_getId(server), Server_getRound(server));
     List *connections = Vertex_getEdges(serverVertex);
     for (int i = 0; i < List_getSize(connections); i += 1) {
         Vertex *connectedVertex = (Vertex *) List_getItem(connections, i);
         Server *connectedServer = (Server *) Vertex_getData(connectedVertex);
-        printf("Server_checkConnections - checking %d %d\n", Server_getId(connectedServer), Server_getRound(connectedServer));
         if (Server_getRound(server) == Server_getRound(connectedServer)) {
-            printf("Server_checkConnections - failed!\n");
             return 0;
         }
     }
-    printf("Server_checkConnections - ok!\n");
     return 1;
 }
 
-void Server_setMinimumUpdateRound(Vertex* serverVertex) {
+int Server_setMinimumUpdateRound(const Vertex* serverVertex) {
     Server *server = Vertex_getData(serverVertex);
-    printf("Server_setMinimumUpdateRound - %d\n", Server_getId(server));
-    int minimum = 0;
+
+    int minRound = 0;
     do {
-        minimum += 1;
-        Server_setRound(server, minimum);
-        printf("Server_setMinimumUpdateRound - trying with %d\n", minimum);
+        minRound += 1;
+        Server_setRound(server, minRound);
     } while (!Server_checkConnections(serverVertex));
-    printf("Server_setMinimumUpdateRound - found %d!\n", minimum);
+
+    return minRound;
 }
 
-int compareServers(const void *a, const void *b) {
-    Vertex *vertexA = (*((Vertex **) a));
-    Vertex *vertexB = (*((Vertex **) b));
-    Server *serverA = Vertex_getData(vertexA);
-    Server *serverB = Vertex_getData(vertexB);
-    return serverA->round > serverB->round;
-}
-
-void Network_saveRoundsAndAllocation(Graph *graph, int minRounds) {
+int Network_checkAllocation(const Graph *graph) {
     Vertex **vertices = Graph_getVertices(graph);
     int verticesNumber = Graph_getVerticesNumber(graph);
+    Vertex *serverVertex;
+    int validAllocation = 1;
+    for (int i = 0; i < verticesNumber; i += 1) {
+        serverVertex = vertices[i];
+        if (!Server_checkConnections(serverVertex)) {
+            validAllocation = 0;
+        }
+    }
+    printf("Servers allocation is%s valid!\n", validAllocation ? "" : " NOT");
+    return validAllocation;
+}
+
+void Network_saveRoundsAndAllocation(const Graph *graph, const int minRounds) {
     FILE *file;
-    Server *server;
 
     file = fopen(MIN_ROUNDS_OUTPUT_FILE_NAME, "w");
     fprintf(file, "%d\n", minRounds);
@@ -119,10 +113,13 @@ void Network_saveRoundsAndAllocation(Graph *graph, int minRounds) {
     fclose(file);
 
     file = fopen(ALLOCATION_OUTPUT_FILE_NAME, "w");
+    Vertex **vertices = Graph_getVertices(graph);
+    int verticesNumber = Graph_getVerticesNumber(graph);
+    Server *server;
     for (int i = 0; i < verticesNumber; i += 1) {
         server = (Server *) Vertex_getData(vertices[i]);
-        fprintf(file, "%d %d\n", server->id, server->round);
-        printf("%d %d\n", server->id, server->round);
+        fprintf(file, "%d %d\n", i + 1, server->round);
+        printf("%d %d\n", i + 1, server->round);
     }
     fclose(file);
 }
