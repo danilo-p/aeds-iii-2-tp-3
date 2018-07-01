@@ -3,6 +3,14 @@
 #include "lib/graph.h"
 #include "lib/list.h"
 
+/**
+ * @brief Allocate the servers on update rounds.
+ * 
+ * Time complexity (Worst case): O(V * E²).
+ * 
+ * @param network The network graph.
+ * @return int The minimum number of rounds required for the update.
+ */
 int Network_allocateUpdateRounds(const Graph *network) {
     int minRounds = 0;
 
@@ -18,6 +26,13 @@ int Network_allocateUpdateRounds(const Graph *network) {
     return minRounds;
 }
 
+/**
+ * @brief The main function.
+ * 
+ * Time complexity (Worst case): O(V * E²).
+ * 
+ * @return int Program's exit status code.
+ */
 int main() {
     int n, m;
     Graph *network = Network_build(&n, &m);
