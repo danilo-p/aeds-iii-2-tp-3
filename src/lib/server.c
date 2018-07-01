@@ -19,8 +19,16 @@ Server * Server_create(int id) {
     return server;
 }
 
+int Server_getId(Server *server) {
+    return server->id;
+}
+
 int Server_getRound(Server *server) {
     return server->round;
+}
+
+void Server_setRound(Server *server, int round) {
+    server->round = round;
 }
 
 void Server_destroy(Server *server) {
@@ -62,33 +70,33 @@ void Network_destroyGraph(Graph *graph) {
     Graph_destroy(graph);
 }
 
-void Network_allocateUpdateRounds(Graph *graph) {
-    int i, j, rounds = 1;
-    int verticesNumber = Graph_getVerticesNumber(graph);
-    Vertex **vertices = Graph_getVertices(graph);
-    for (i = 0; i < verticesNumber; i += 1) {
-        Vertex *serverVertex = vertices[i];
-        List *serverEdges = Vertex_getEdges(serverVertex);
-        int available[rounds];
-        for (j = 0; j < rounds; j += 1) { available[j] = 1; }
-        for (j = 0; j < List_getSize(serverEdges); j += 1) {
-            Vertex *connectedVertex = (Vertex *) List_getItem(serverEdges, j);
-            Server *connectedServer = (Server *) Vertex_getData(connectedVertex);
-            if (connectedServer->round > 0) {
-                available[connectedServer->round - 1] = 0;
-            }
-        }
-        Server *server = (Server *) Vertex_getData(serverVertex);
-        for (j = 0; j < rounds; j += 1) {
-            if (available[j]) {
-                server->round = j + 1;
-                break;
-            }
-        }
-        if (!server->round) {
-            server->round = ++rounds;
+int Server_checkConnections(Vertex* serverVertex) {
+    Server *server = (Server *) Vertex_getData(serverVertex);
+    printf("Server_checkConnections - %d %d\n", Server_getId(server), Server_getRound(server));
+    List *connections = Vertex_getEdges(serverVertex);
+    for (int i = 0; i < List_getSize(connections); i += 1) {
+        Vertex *connectedVertex = (Vertex *) List_getItem(connections, i);
+        Server *connectedServer = (Server *) Vertex_getData(connectedVertex);
+        printf("Server_checkConnections - checking %d %d\n", Server_getId(connectedServer), Server_getRound(connectedServer));
+        if (Server_getRound(server) == Server_getRound(connectedServer)) {
+            printf("Server_checkConnections - failed!\n");
+            return 0;
         }
     }
+    printf("Server_checkConnections - ok!\n");
+    return 1;
+}
+
+void Server_setMinimumUpdateRound(Vertex* serverVertex) {
+    Server *server = Vertex_getData(serverVertex);
+    printf("Server_setMinimumUpdateRound - %d\n", Server_getId(server));
+    int minimum = 0;
+    do {
+        minimum += 1;
+        Server_setRound(server, minimum);
+        printf("Server_setMinimumUpdateRound - trying with %d\n", minimum);
+    } while (!Server_checkConnections(serverVertex));
+    printf("Server_setMinimumUpdateRound - found %d!\n", minimum);
 }
 
 int compareServers(const void *a, const void *b) {
@@ -99,23 +107,15 @@ int compareServers(const void *a, const void *b) {
     return serverA->round > serverB->round;
 }
 
-void Network_saveRoundsAndAllocation(Graph *graph) {
+void Network_saveRoundsAndAllocation(Graph *graph, int minRounds) {
     Vertex **vertices = Graph_getVertices(graph);
     int verticesNumber = Graph_getVerticesNumber(graph);
     FILE *file;
     Server *server;
 
-    qsort(
-        vertices,
-        verticesNumber,
-        sizeof(Vertex *),
-        compareServers
-    );
-
     file = fopen(MIN_ROUNDS_OUTPUT_FILE_NAME, "w");
-    server = (Server *) Vertex_getData(vertices[verticesNumber - 1]);
-    fprintf(file, "%d\n", server->round);
-    printf("%d\n", server->round);
+    fprintf(file, "%d\n", minRounds);
+    printf("%d\n", minRounds);
     fclose(file);
 
     file = fopen(ALLOCATION_OUTPUT_FILE_NAME, "w");

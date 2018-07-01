@@ -37,7 +37,7 @@ run_fb:
 	$(BIN_DIR)/$(BIN_NAME)fb
 
 valgrind_fb:
-	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all $(BIN_DIR)/$(BIN_NAME)brute_force
+	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all $(BIN_DIR)/$(BIN_NAME)fb
 
 valgrind_h:
 	valgrind --track-origins=yes --leak-check=full --show-leak-kinds=all $(BIN_DIR)/$(BIN_NAME)h
