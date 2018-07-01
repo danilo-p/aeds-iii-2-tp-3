@@ -57,6 +57,8 @@ int Network_isAllocationPossible(const Graph *network,
         }
     }
 
+    Server_setRound(currentServer, 0);
+
     return 0;
 }
 

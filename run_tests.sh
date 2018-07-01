@@ -1,21 +1,18 @@
 #! /bin/bash
 
-echo "Heurística"
-for test in $(seq 1 10); do
-    echo "---------------------------------------------------"
-    echo "entrada$test"
-    time ./tp3h < ./samples/TesteHeuristica/entrada${test}.txt > /dev/null
-    diff ./rodada.txt ./samples/TesteHeuristica/rodada${test}.txt
-    echo "---------------------------------------------------"
-    echo ""
-done
+make
 
-echo "Força bruta"
-for test in $(seq 1 26); do
-    echo "---------------------------------------------------"
-    echo "exemplo $test"
-    time ./tp3fb < ./samples/exemplos/entrada/entrada${test}.txt > /dev/null
-    diff ./rodada.txt ./samples/exemplos/saida/rodada${test}.txt
-    echo "---------------------------------------------------"
+for i in $(seq 1 100); do
+	echo ""
+    echo ""
+	echo "input${i}.txt";
+	echo ""
+	echo "tp3fb"
+	./tp3fb < ./samples/generated/input${i}.txt > ./out_tp3fb.txt
+	echo ""
+	echo "tp3h"
+	./tp3h < ./samples/generated/input${i}.txt > ./out_tp3h.txt
+	echo ""
+    diff <(head -1 ./out_tp3fb.txt) <(head -1 ./out_tp3h.txt)
     echo ""
 done

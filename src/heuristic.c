@@ -6,7 +6,7 @@
 /**
  * @brief Allocate the servers on update rounds.
  * 
- * Time complexity (Worst case): O(V + E²).
+ * Time complexity (Worst case): O(V + m*E).
  * 
  * @param network The network graph.
  * @return int The minimum number of rounds required for the update.
@@ -29,7 +29,7 @@ int Network_allocateUpdateRounds(const Graph *network) {
 /**
  * @brief The main function.
  * 
- * Time complexity (Worst case): O(V + E²).
+ * Time complexity (Worst case): O(V + m*E).
  * 
  * @return int Program's exit status code.
  */
